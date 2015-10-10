@@ -13,7 +13,7 @@
       {
           "matches": ["<all_urls>"],
           "css": ["squanchyStyle.css"],
-          "js": ["jquery.js", "squanchify.js"]
+          "js": ["js/jquery.min.js","js/underscore-min.js","js/squanchify.js"]
       }
   ],
   "permissions": [
