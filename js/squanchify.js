@@ -1,15 +1,16 @@
 $(document).ready(function(){
 
     // Oh geez, oh man Rick...I guess I'll start it off.
-    const origDocument = $(document);
+    var origLength = $(document)[0].links.length;
     squanchify(0.9);
-
     /* If people have endless scrolling on, Morty, I'm...I'm gonna make
        sure those assholes don't lose their squanch. You-you gotta keep
+
        the squanch GOING, Morty. More. MORE! Let's see where this goes! */
     $(document).scroll(function(){
-        if($(document)[0].links.length > origDocument[0].links.length) {
+        if($(document)[0].links.length > origLength) {
             squanchify(0.9);
+            origLength = $(document)[0].links.length;
         }
     });
 });
