@@ -1,9 +1,9 @@
-.squanch-adjuster {
+.squanchy-slider {
     -webkit-appearance: none;
     align-content: center;
 }
 
-.squanch-adjuster::-webkit-slider-runnable-track {
+.squanchy-slider::-webkit-slider-runnable-track {
     width: 100%;
     height: 5px;
     background: #ddd;
@@ -12,7 +12,7 @@
     margin: 10px;
 }
 
-.squanch-adjuster::-webkit-slider-thumb {
+.squanchy-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     border: none;
     height: 16px;
@@ -22,11 +22,11 @@
     margin-top: -4px;
 }
 
-.squanch-adjuster:focus {
+.squanchy-slider:focus {
     outline: none;
 }
 
-.squanch-adjuster:focus::-webkit-slider-runnable-track {
+.squanchy-slider:focus::-webkit-slider-runnable-track {
     background: #ccc;
 }
 

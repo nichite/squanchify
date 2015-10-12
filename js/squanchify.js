@@ -1,17 +1,27 @@
+var squanchPrefs = {
+    'squanchiness': 0.95,
+    'activated': true
+};
+
 $(document).ready(function(){
 
     // Oh geez, oh man Rick...I guess I'll start it off.
-    var origLength = $(document)[0].links.length;
-    squanchify(0.9);
+    var origLength = document.links.length;
+    loadSquanchiness();
+
     /* If people have endless scrolling on, Morty, I'm...I'm gonna make
        sure those assholes don't lose their squanch. You-you gotta keep
-
        the squanch GOING, Morty. More. MORE! Let's see where this goes! */
-    $(document).scroll(function(){
-        if($(document)[0].links.length > origLength) {
-            squanchify(0.9);
-            origLength = $(document)[0].links.length;
+    $(document).on("scroll",function(){
+        if(document.links.length > origLength && squanchPrefs.activated === true) {
+            squanchify(squanchPrefs.squanchiness);
+            origLength = document.links.length;
         }
+    });
+
+    // Make sure there's complete squanchiness control.
+    chrome.runtime.onMessage.addListener(function(request, sender, callback) {
+       console.log("Message worked!");
     });
 });
 
@@ -59,6 +69,7 @@ squanchify = function(squanchiness){
                    where they came from and stick it back in later. No one will even know the difference,
                    Morty. We're really...wuhh...flying under the radar with this one. */
                 var unSquanchedWords = elementText.split(splitRegex);
+
                 if (!unSquanchedWords[0] || unSquanchedWords.join(" ").match(/squanch/i) ) {
                     continue;
                 }
@@ -77,8 +88,8 @@ squanchify = function(squanchiness){
                         var hasCharacters = wordToSquanch.match(/[a-z]/i);
 
 
-                    if (hasCharacters && !prevSquanch) {
-                        //Math.random() > squanchiness &&
+                    if (Math.random() > squanchiness && hasCharacters && !prevSquanch) {
+
                         var squanchText;
                         var isSquanchable = true;
 
@@ -136,5 +147,27 @@ squanchify = function(squanchiness){
                 DOMElements[i].innerHTML = squanchedWords.trim();
             }
         }
+    });
+};
+
+loadSquanchiness = function() {
+    var defaultSquanchiness = 0.95;
+    chrome.storage.sync.get('squanchiness', function(data) {
+        if (data.squanchiness === undefined) {
+            data.squanchiness = squanchPrefs.squanchiness;
+            chrome.storage.sync.set({"squanchiness": data.squanchiness});
+        } else {
+            squanchPrefs.squanchiness = data.squanchiness;
+        }
+        chrome.storage.sync.get('activated', function(data) {
+            if (data.activated === undefined) {
+                data.activated = squanchPrefs.activated;
+                chrome.storage.sync.set({"activated": data.activated});
+            } else {
+                squanchPrefs.activated = data.activated;
+            }
+            if (squanchPrefs.activated === true)
+                squanchify(squanchPrefs.squanchiness);
+        });
     });
 };
