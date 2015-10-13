@@ -1,10 +1,21 @@
+.container {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.squanchiness-prompt {
+    font-size: 12pt;
+}
+
 .squanchy-slider {
+    width: inherit;
+    margin-top: 10px;
     -webkit-appearance: none;
     align-content: center;
 }
 
 .squanchy-slider::-webkit-slider-runnable-track {
-    width: 100%;
+    width: inherit;
     height: 5px;
     background: #ddd;
     border: none;
@@ -20,6 +31,7 @@
     border-radius: 50%;
     background: goldenrod;
     margin-top: -4px;
+    cursor: pointer;
 }
 
 .squanchy-slider:focus {
@@ -30,6 +42,20 @@
     background: #ccc;
 }
 
-.container {
-    padding: 20px;
+.squanchy-button {
+  position: relative;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  vertical-align: top;
+  width: 100%;
+  height: 60px;
+  padding: 0;
+  font-size: 14pt;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  background: goldenrod;
+  border: 0;
+  cursor: pointer;
+  border-radius: 5px;
 }

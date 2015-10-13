@@ -5,9 +5,11 @@ var defaults = {
 
 $(document).ready(function(){
     loadSquanchPrefs();
-    $(".resquanch-button").on("click", function(){
-        tryGetValue('activated', deOrReSquanch);
+
+    $(".squanchy-button").on("click", function(){
+        tryGetStorageValue('activated', deOrReSquanch);
     });
+
     $(".squanchy-slider").on("change", function(){
         var sliderVal = this.value;
         updateSquanchiness(mapSliderToSquanchiness(sliderVal));
@@ -15,40 +17,25 @@ $(document).ready(function(){
 });
 
 loadSquanchPrefs = function() {
-    tryGetValue('squanchiness', setSquanchySlider);
-    tryGetValue('activated', setSquanchButton);
+    tryGetStorageValue('squanchiness', setSquanchySlider);
+    tryGetStorageValue('activated', setSquanchButton);
 };
 
 setSquanchySlider = function(squanchiness){
     $(".squanchy-slider").val(mapSquanchinessToSlider(squanchiness));
 };
 
-reSquanch = function(squanchiness){
-
-    var thisTabId;
-    chrome.tabs.query({active: true}, function(tabs){
-        thisTabId = tabs[0].id;
-    });
-    chrome.tabs.query({}, function(tabs) {
-        var message = {"squanchiness": 0};
-        var reloadMessage = {"squanchiness": squanchiness, reload: true};
-        for (var i=0; i<tabs.length; ++i) {
-            if (tabs[i].id ===  thisTabId)
-                chrome.tabs.sendMessage(tabs[i].id, reloadMessage);
-            else
-                chrome.tabs.sendMessage(tabs[i].id, message);
-        }
-    });
-};
-
-reloadCurrentTab = function() {
-    chrome.tabs.query({active: true}, function(tabs){
-        chrome.tabs.reload(tabs[0].id);
-    });
+setSquanchButton = function(activated) {
+    var squanchButton = $(".squanchy-button");
+    if (activated === true) {
+        squanchButton.html("De-Squanch");
+    } else {
+        squanchButton.html("Re-Squanch");
+    }
 };
 
 deOrReSquanch = function(activated) {
-    var squanchButton = $(".resquanch-button");
+    var squanchButton = $(".squanchy-button");
     if (activated === true) {
         squanchButton.html("Re-Squanch");
         chrome.storage.sync.set({'activated': false}, reloadCurrentTab);
@@ -58,16 +45,13 @@ deOrReSquanch = function(activated) {
     }
 };
 
-setSquanchButton = function(activated) {
-    var squanchButton = $(".resquanch-button");
-    if (activated === true) {
-        squanchButton.html("De-Squanch");
-    } else {
-        squanchButton.html("Re-Squanch");
-    }
+reloadCurrentTab = function() {
+    chrome.tabs.query({active: true}, function(tabs){
+        chrome.tabs.reload(tabs[0].id);
+    });
 };
 
-tryGetValue = function(inputVal, setFunction) {
+tryGetStorageValue = function(inputVal, setFunction) {
     return chrome.storage.sync.get(inputVal, function(data) {
         if (data[inputVal] === undefined) {
             data[inputVal] = defaults[inputVal];
