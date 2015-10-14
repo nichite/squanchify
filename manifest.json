@@ -16,9 +16,12 @@
   },
 
     "browser_action": {
-    "default_icon": "squanchy.png",
     "default_popup": "howSquanchy.html"
   },
+
+  "icons": { "16": "icons/squanchy-16.png",
+           "48": "icons/squanchy-48.png",
+          "128": "icons/squanchy-128.png" },
 
   "content_scripts": [
       {
