@@ -1,6 +1,12 @@
 .container {
     padding-left: 10px;
     padding-right: 10px;
+    width: 225px;
+}
+
+.slider-container {
+    height: 50%;
+    display: none;
 }
 
 .squanchiness-prompt {
@@ -8,8 +14,7 @@
 }
 
 .squanchy-slider {
-    width: inherit;
-    margin-top: 10px;
+    width: 100%;
     -webkit-appearance: none;
     align-content: center;
 }
@@ -57,5 +62,8 @@
   background: goldenrod;
   border: 0;
   cursor: pointer;
-  border-radius: 5px;
+}
+
+.squanchy-button:focus {
+    outline: 0 solid transparent;
 }
