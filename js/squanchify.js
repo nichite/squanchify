@@ -20,7 +20,9 @@ $(document).ready(function(){
 
         /* Huh? checking document links length? I don't get it, Rick! I'm losing
            it, man! */
-        /* Morty, I'm gonna need you to quit your bitching and keep typinb*/
+        /* Morty, I'm gonna need you to quit your bitching and keep typing. We only
+           want to re-squanchify if more content got loaded from endless scrolling.
+           You'd know that if...if you were paying att--any attention, MORTY.*/
         if(document.links.length > origLength && squanchPrefs.activated === true) {
             squanchify(squanchPrefs.squanchiness);
             origLength = document.links.length;
