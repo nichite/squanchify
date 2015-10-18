@@ -79,9 +79,16 @@ updateActivated = function(activated, reloadTabInd) {
 };
 
 mapSliderToSquanchiness = function(sliderVal) {
-    return 1 - (sliderVal/100);
+    // The lower ten slider values produce very subtle squanchiness (<1%)
+    if (sliderVal <= 10)
+        return 1 - (sliderVal/1000);
+    else
+        return (1110 - 11*sliderVal)/1000;
 };
 
 mapSquanchinessToSlider = function(squanchiness) {
-    return (100*(1 - squanchiness));
+    if (squanchiness >= 0.99)
+        return (1000*(1 - squanchiness));
+    else
+        return -(10/11)*(100*squanchiness - 111);
 };
