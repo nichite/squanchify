@@ -58,17 +58,20 @@ squanchify = function(squanchiness){
 
     var listOfSelectors = ["em","a","span","li","p","h1","h1","h2","h3","h4","h5","h6","div"];
 
-    var tagRegex = /<.*>/g;
+    var tagRegex = /<[^>]*>/g;
     var escapedHTMLRegex = /\&[a-z]+\;/i;
-    var splitRegex = /\s+|\s*<.*>\s*/;
+    var splitRegex = /\s+|\s*<[^>]*>\s*/;
     var replacementRegex = /\w+\'*\w*/;
+    var prefixSpacesRegex = /\s*/;
 
     listOfSelectors.forEach(function(selector){
 
         var DOMElements = document.querySelectorAll(selector);
         for (var i = 0; i < DOMElements.length; i++){
 
-            var elementText = DOMElements[i].innerHTML.trim();
+            var innerHTML = DOMElements[i].innerHTML;
+            var prefixSpaces = prefixSpacesRegex.exec(innerHTML);
+            var elementText = innerHTML.trim();
 
             if (elementText) {
 
@@ -190,7 +193,7 @@ squanchify = function(squanchiness){
                 // Dad!
                 // Oh, sorry Jerry, I'll buy you a new one. You know, from a ten-year-old kid who did ten times as good a job.
                 squanchedWords = unSquanchedWords.join(joinerString);
-                DOMElements[i].innerHTML = squanchedWords.trim();
+                DOMElements[i].innerHTML = prefixSpaces + squanchedWords.trim();
             }
         }
     });
