@@ -55,27 +55,28 @@ reloadCurrentTab = function() {
 };
 
 tryGetStorageValue = function(inputVal, setFunction, reloadTabInd) {
-    return chrome.storage.sync.get(inputVal, function(data) {
+    return chrome.storage.local.get(inputVal, function(data) {
         if (data[inputVal] === undefined) {
             data[inputVal] = defaults[inputVal];
         }
+
         setFunction(data[inputVal], reloadTabInd);
     });
 };
 
 updateSquanchiness = function(squanchiness, reloadTabInd) {
     if (reloadTabInd)
-        chrome.storage.sync.set({'squanchiness': squanchiness}, reloadCurrentTab);
+        chrome.storage.local.set({'squanchiness': squanchiness}, reloadCurrentTab);
     else {
-        chrome.storage.sync.set({'squanchiness': squanchiness});
+        chrome.storage.local.set({'squanchiness': squanchiness});
     }
 };
 
 updateActivated = function(activated, reloadTabInd) {
     if (reloadTabInd)
-        chrome.storage.sync.set({'activated': activated}, reloadCurrentTab);
+        chrome.storage.local.set({'activated': activated}, reloadCurrentTab);
     else
-        chrome.storage.sync.set({'activated': activated});
+        chrome.storage.local.set({'activated': activated});
 };
 
 mapSliderToSquanchiness = function(sliderVal) {

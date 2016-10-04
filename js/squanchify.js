@@ -1,37 +1,37 @@
 // Copyright (c) 2015 Nic Hite <nichite@gmail.com>
 // Licensed under the MIT license, read LICENSE.txt
-
-var squanchPrefs = {
-    'squanchiness': 0.95,
-    'activated': true
-};
-
 $(document).ready(function(){
 
     /* Oh geez, oh man, Rick...I-I guess I'll start it off. Preferences are in
        Chrome storage, right?*/
     var origLength = document.links.length;
-    loadSquanchiness();
+    toSquanchOrNotToSquanch();
 
     /* If people have endless scrolling on, Morty, I'm...I'm gonna make
        sure those assholes don't lose their squanch. You-you gotta keep
        the squanch GOING, Morty. More. MORE! Let's see where this goes! */
-    $(document).on("scroll",function(){
+    $(document).on("scroll",debounce(function(){
 
         /* Huh? checking document links length? I don't get it, Rick! I'm losing
            it, man! */
         /* Morty, I'm gonna need you to quit your bitching and keep typing. We only
            want to re-squanchify if more content got loaded from endless scrolling.
            You'd know that if...if you were paying att--any attention, MORTY.*/
-        if(document.links.length > origLength && squanchPrefs.activated === true) {
-            squanchify(squanchPrefs.squanchiness);
+        if(document.links.length > origLength) {
+            toSquanchOrNotToSquanch();
             origLength = document.links.length;
         }
-    });
+    }, 0));
 });
 
-squanchify = function(squanchiness){
+// squanchiness is value that is equal to the threshold a randomly generated
+// number from 0-1 (using Math.random()) must be greater than to squanch.
+// The lower the squanchiness, the higher propability a word will be squanched.
+// Kinda the opposite of what you'd expect. Maybe I should change that.
+var squanchify = function(squanchiness){
 
+    // Skip all prepositions, all forms of pronouns, etc--this way all sentences
+    // stay intact
     var unsquanchables = ["a","aboard","about","above","absent","across","after",
     "against","along","alongside","amid","amidst","among","an","and","are","around","as","at",
     "atop","before","behind","below","beneath","beside","between","by","despite",
@@ -42,9 +42,12 @@ squanchify = function(squanchiness){
     "times","to","toward","under","underneath","until","up","upon","we","which","who",
     "whom","whose","with","within","without","you"];
 
+    // we want to squanch gerunds, but let's leave these ones out--we want all nouns
+    // to turn to 'squanch'
     var ingExceptions = ["bling","bring","ceiling","ching","cling","ding","fling","king",
     "ping","ring","sing","sling","spring","sting","string","swing","thing","viking","wing","wring","zing"];
 
+    // Words that end with 'ly' but aren't adverb--we'll need to handle these differently
     var lyExceptions = ["ally","anomaly", "apply", "assembly", "belly", "bely", "bodily", "bubbly", "bully",
     "burly", "chilly", "comely", "comply", "costly", "courtly", "cuddly", "curly", "daily", "dally",
     "dastardly", "deadly", "deathly", "disorderly", "doily", "dolly", "dragonfly", "early", "family",
@@ -56,8 +59,10 @@ squanchify = function(squanchiness){
     "squiggly", "stately", "steely", "supply", "supply", "surly", "tally", "timely", "ugly", "unlikely",
     "weekly", "wily", "wobbly", "wooly", "worldly", "wrinkly", "yearly"];
 
+    // A full-scale DFS through the DOM
     var listOfSelectors = ["em","a","span","li","p","h1","h1","h2","h3","h4","h5","h6","div"];
 
+    // Selectively going through the DOM of any arbitrary site is messy
     var tagRegex = /<.*>/g;
     var escapedHTMLRegex = /\&[a-z]+\;/i;
     var splitRegex = /\s+|\s*<.*>\s*/;
@@ -89,6 +94,8 @@ squanchify = function(squanchiness){
                    Morty. We're really...wuhh...flying under the radar with this one. */
                 var unSquanchedWords = elementText.split(splitRegex);
 
+                // don't squanch any elements that have already been squanched and no
+                // empty strings
                 if (!unSquanchedWords[0] || unSquanchedWords.join(" ").match(/squanch/i) ) {
                     continue;
                 }
@@ -99,14 +106,17 @@ squanchify = function(squanchiness){
                         // Okay, Morty. Here's the word. Don't forget it.
                         var wordToSquanch = unSquanchedWords[j];
 
+                        // Another (arbitrarily chosen) threshold is that we won't
+                        // squanch consecutive words unless the squanchiness is high
                         var prevSquanch;
                         if (j > 0 && squanchiness > 0.10)
                             prevSquanch = unSquanchedWords[j-1].match(/squanch/i);
                         var hasCharacters = wordToSquanch.match(/[a-z]/i);
 
-
+                    // Here's the main check to see if a word will be squanched
                     if (Math.random() > squanchiness && hasCharacters && !prevSquanch) {
 
+                        // Commence squanching
                         var squanchText;
                         var isSquanchable = true;
 
@@ -169,6 +179,8 @@ squanchify = function(squanchiness){
                     for (j = 0; j < possibleLinks.length; j++) {
                         unSquanchedWords[unSquanchedWords.indexOf("")] = possibleLinks[j];
                     }
+                    // A specific case that pops up do to the regex not perfectly handling
+                    // selector texts that are couched in parentheses
                     if (unSquanchedWords.length === 2 && unSquanchedWords[0] === "(" && unSquanchedWords[1] === ")") {
                             unSquanchedWords = ["(", possibleLinks, ")"];
                             joinerString = "";
@@ -196,24 +208,52 @@ squanchify = function(squanchiness){
     });
 };
 
-loadSquanchiness = function() {
-    var defaultSquanchiness = 0.95;
-    chrome.storage.sync.get('squanchiness', function(data) {
-        if (data.squanchiness === undefined) {
-            data.squanchiness = squanchPrefs.squanchiness;
-            chrome.storage.sync.set({"squanchiness": data.squanchiness});
-        } else {
-            squanchPrefs.squanchiness = data.squanchiness;
-        }
-        chrome.storage.sync.get('activated', function(data) {
-            if (data.activated === undefined) {
-                data.activated = squanchPrefs.activated;
-                chrome.storage.sync.set({"activated": data.activated});
-            } else {
-                squanchPrefs.activated = data.activated;
+// That is the question.
+var toSquanchOrNotToSquanch = function() {
+
+  // They downloaded the extension. They knew what they were getting themselves
+  // into.
+  var defaultActivated = true;
+
+  // grab the local storage value for if squanching is activated
+  chrome.storage.local.get('activated', function(data) {
+
+      // If they've never used it before, set the storage value.
+      // Why check against those values explicitly? We want to obey the value
+      // when it's false, which is, surprisingly, a falsey value.
+      if (data.activated === undefined || data.activated === null) {
+          data.activated = defaultActivated;
+          chrome.storage.local.set({"activated": data.activated});
+      }
+      if (data.activated) {
+        // Gotta fall back to something if they've never squanched before, Morty.
+        var defaultSquanchiness = 0.95;
+
+        // grab the local storage value for squanchiness
+        chrome.storage.local.get('squanchiness', function(data) {
+            if (!data.squanchiness) {
+                alert("Squanchiness = " + data.squanchiness);
+                data.squanchiness = defaultSquanchiness;
+                chrome.storage.local.set({"squanchiness": data.squanchiness});
             }
-            if (squanchPrefs.activated === true)
-                squanchify(squanchPrefs.squanchiness);
+            squanchify(data.squanchiness);
         });
-    });
+      }
+  });
+}
+
+// Like I'm really gonna use the whole underscore lib for this.
+var debounce = function(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
 };
