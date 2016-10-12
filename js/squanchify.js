@@ -232,7 +232,6 @@ var toSquanchOrNotToSquanch = function() {
         // grab the local storage value for squanchiness
         chrome.storage.local.get('squanchiness', function(data) {
             if (!data.squanchiness) {
-                alert("Squanchiness = " + data.squanchiness);
                 data.squanchiness = defaultSquanchiness;
                 chrome.storage.local.set({"squanchiness": data.squanchiness});
             }
